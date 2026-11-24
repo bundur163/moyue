@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="零依赖的 Markdown 文档阅读器：左侧页面预览，右侧单页阅读，支持全文搜索与选中复制。">
+<title>Markdown 阅读器</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232b2a26'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='17' fill='%23f8f4ea' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="is-empty">
+
+<header class="topbar">
+  <div class="brand" title="Markdown 阅读器">
+    <span class="brand-mark">M</span>
+    <span class="brand-name">墨阅</span>
+  </div>
+
+  <div class="doc-head">
+    <span class="doc-title" id="docTitle">未打开文档</span>
+    <span class="doc-badge" id="docBadge">Markdown</span>
+  </div>
+
+  <div class="topbar-spacer"></div>
+
+  <div class="topbar-controls" id="topbarControls" hidden>
+    <div class="search-box" id="searchBox">
+      <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.2 4.2"></path>
+      </svg>
+      <input id="searchInput" type="text" placeholder="搜索文档…" autocomplete="off" spellcheck="false" aria-label="搜索文档">
+      <span class="search-count" id="searchCount" hidden></span>
+      <button class="icon-btn search-nav" id="searchPrev" type="button" title="上一个命中（Shift+Enter）" aria-label="上一个命中" disabled>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"></path></svg>
+      </button>
+      <button class="icon-btn search-nav" id="searchNext" type="button" title="下一个命中（Enter）" aria-label="下一个命中" disabled>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10l6 6 6-6"></path></svg>
+      </button>
+      <button class="icon-btn search-clear" id="searchClear" type="button" title="清除搜索（Esc）" aria-label="清除搜索" hidden>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </div>
+
+    <span class="v-divider" aria-hidden="true"></span>
+
+    <div class="pager" role="group" aria-label="翻页">
+      <button class="icon-btn" id="prevPage" type="button" title="上一页（←）" aria-label="上一页">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5"></path></svg>
+      </button>
+      <input id="pageInput" class="page-input" type="number" min="1" value="1" aria-label="当前页码">
+      <span class="page-total">/ <span id="pageTotal">0</span></span>
+      <button class="icon-btn" id="nextPage" type="button" title="下一页（→）" aria-label="下一页">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5L16 12l-6.5 6.5"></path></svg>
+      </button>
+    </div>
+
+    <span class="v-divider" aria-hidden="true"></span>
+
+    <div class="zoom" role="group" aria-label="缩放">
+      <button class="icon-btn" id="zoomOut" type="button" title="缩小" aria-label="缩小">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg>
+      </button>
+      <button class="zoom-label" id="zoomLabel" type="button" title="适应窗口">100%</button>
+      <button class="icon-btn" id="zoomIn" type="button" title="放大" aria-label="放大">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg>
+      </button>
+    </div>
+
+    <button class="btn btn-print" id="printBtn" type="button" title="打印全部页面（Ctrl+P）">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a2 2 0 01-2-2v-4a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2h-2M7 14h10v6H7z"></path></svg>
+      <span>打印</span>
+    </button>
+  </div>
+
+  <button class="btn btn-open" id="openBtn" type="button">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6H9l2 2.5h7.5A1.5 1.5 0 0120 10v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18z"></path></svg>
+    <span>打开文件</span>
+  </button>
+  <input type="file" id="fileInput" accept=".md,.markdown,.mdown,.mkd,.txt,text/markdown,text/plain" hidden>
+</header>
+
+<div class="workspace">
+  <aside class="sidebar" id="sidebar" hidden aria-label="文档导航">
+    <div class="sidebar-head">
+      <div class="sidebar-tabs" role="tablist" aria-label="导航模式">
+        <button class="sidebar-tab active" id="tabPages" type="button" role="tab" aria-selected="true" aria-controls="thumbs" title="页面预览">页面</button>
+        <button class="sidebar-tab" id="tabOutline" type="button" role="tab" aria-selected="false" aria-controls="outline" title="文档大纲">大纲</button>
+      </div>
+      <span class="sidebar-count" id="sidebarCount">0</span>
+      <button class="icon-btn sidebar-collapse" id="collapseSidebar" type="button" title="收起页面预览" aria-label="收起页面预览">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5"></path></svg>
+      </button>
+    </div>
+    <div class="thumbs" id="thumbs" role="tabpanel" aria-labelledby="tabPages"></div>
+    <div class="outline" id="outline" role="tabpanel" aria-labelledby="tabOutline" hidden></div>
+  </aside>
+
+  <button class="sidebar-expand" id="expandSidebar" type="button" title="展开页面预览" aria-label="展开页面预览" hidden>
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5L16 12l-6.5 6.5"></path></svg>
+  </button>
+
+  <main class="stage" id="stage">
+    <section class="empty" id="emptyState">
+      <div class="empty-card" id="dropCard">
+        <div class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <rect x="15" y="9" width="30" height="42" rx="3" class="paper-back"></rect>
+            <rect x="20" y="14" width="30" height="42" rx="3" class="paper-front"></rect>
+            <path d="M27 24h16M27 31h16M27 38h10" class="paper-lines"></path>
+          </svg>
+        </div>
+        <h1>打开一份 Markdown 文档</h1>
+        <p class="empty-sub">拖拽文件到这里，或选择本地文件开始阅读</p>
+        <div class="empty-actions">
+          <button class="btn btn-primary" id="emptyOpenBtn" type="button">选择文件</button>
+          <button class="btn btn-ghost" id="demoBtn" type="button">查看示例</button>
+        </div>
+        <p class="empty-hint">支持 .md / .markdown / .txt · 自动分页 · 左侧预览 · 右侧阅读</p>
+      </div>
+      <div class="empty-foot">
+        <span>← → 翻页</span><span>Ctrl+F 搜索</span><span>Ctrl+O 打开</span>
+      </div>
+    </section>
+
+    <div class="stage-scroll" id="stageScroll" hidden>
+      <div class="stage-inner" id="stageInner">
+        <div class="page-frame" id="pageFrame">
+          <div class="page-zoom" id="pageZoom"></div>
+        </div>
+        <div class="continuous-stack" id="continuousStack" hidden></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer class="statusbar">
+  <div class="status-left" id="statusHint">Ctrl+O 打开文件 · 拖拽文件到窗口</div>
+  <div class="status-right" id="statusStats">未打开文档</div>
+</footer>
+
+<div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+  <div class="drop-box">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M8 8l4-4 4 4M4 16v3h16v-3"></path></svg>
+    <span>松开以打开 Markdown 文件</span>
+  </div>
+</div>
+
+<div class="measure-host" id="measureHost" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="print-root" id="printRoot" aria-hidden="true"></div>
+
+<script type="text/markdown" id="demoSource">
+# 墨阅 · Markdown 阅读器示例
+
+这是「墨阅」的示例文档。打开它之后，文档会被排成一张张固定大小的纸：左边是页面缩略预览，右边是当前页正文。翻页、搜索、选中复制，都在一屏之内完成。
+
+> 一张纸，一页字。翻页的时候，注意力应该留在文字上，而不是留在滚动条上。
+
+## 为什么做成纸面
+
+Markdown 本来是流式文本，适合连续滚动。但长文档滚起来容易失去位置感：读到一半，不知道自己在哪里，也不知道还有多少。PDF 阅读器用固定纸面解决了这个问题，我们把这套体验搬到了 Markdown 上。
+
+- **打开即读**：选择文件后直接排版，没有设置页，也没有多余确认。
+- **左侧预览**：每一页都有缩略图，当前页用暖色描边标出，点击即可跳转。
+- **右侧阅读**：单页居中显示，按窗口高度等比缩放，也可以手动放大细看。
+- **原生复制**：正文使用浏览器原生选区，鼠标选中后 Ctrl+C 即可，不劫持任何操作。
+- **本地优先**：文件只在浏览器内存里解析，不上传、不写入，断网也能用。
+
+## 分页是怎么工作的
+
+阅读器先把 Markdown 解析成一个个顶层内容块，再按顺序放进 760 × 1075 的纸面。每放一块就量一次高度，装不下就换下一页。
+
+1. 解析 Markdown，清洗掉脚本与危险链接；
+2. 按块测量高度，逐页装箱，块与块之间的间距只算一次；
+3. 超长代码块按行拆分到多页，其他超高单块独占一页并在页内滚动；
+4. 所有页排完后，统一补上页脚：文档名与「第 N / M 页」。
+
+```js
+const page = { width: 760, height: 1075 };
+const content = page.height - 64 - 92;
+
+function paginate(blocks) {
+  const pages = [];
+  let current = [];
+  let used = 0;
+
+  for (const block of blocks) {
+    const height = measure(block);
+    if (used + height > content && current.length) {
+      pages.push(current);
+      current = [];
+      used = 0;
+    }
+    current.push(block);
+    used += height;
+  }
+  return pages.concat([current]);
+}
+```
+
+这段代码省略了测量细节，但核心就是「装不下就换页」。真正实现里还要处理外边距、超长代码块和横向溢出的表格，这些都可以在 `assets/app.js` 里看到。
+
+### 一条来自示例的引用
+
+> 好的阅读器应该像一张安静的桌子：文档放在上面，工具退到一边。需要搜索时搜索，需要复制时复制，其余时间不打扰。
+
+## 搜索
+
+在顶栏输入「分页」试试。命中会显示成 `当前 / 总数`，当前页的命中用暖黄色标出，正在查看的那一处颜色更深。按 Enter 去下一处，按 Shift+Enter 回上一处，跨页时会自动翻页。
+
+搜索覆盖整篇文档，包括代码块和表格里的文字。它按文本节点匹配，所以极少数被加粗、链接从中间切开的词组可能搜不到——这是刻意保留原生选区与复制的代价，也是「简单」的一部分。
+
+| 操作 | 方式 |
+| --- | --- |
+| 打开文件 | 顶栏按钮、拖拽文件、Ctrl+O |
+| 上一页 / 下一页 | ← →、PageUp / PageDown、顶栏箭头 |
+| 跳到首尾 | Home / End |
+| 搜索 | Ctrl+F，Enter / Shift+Enter 切换命中 |
+| 清除搜索 | Esc |
+| 缩放 | 顶栏 − / +，点击百分比恢复适应窗口 |
+
+## 复制
+
+用鼠标在正文里拖选，然后按 Ctrl+C，或者右键复制。搜索高亮不会改写正文的 DOM，因此不会把高亮标记一起复制出去；页脚、页码和缩略图也不在选区里。
+
+如果一页里既有正文又有代码，可以一起选中；代码块内部横向滚动时，选中的仍然是完整文本。链接会保留地址，表格会按制表符整理成可粘贴的文本。
+
+## 支持哪些 Markdown
+
+- 标题、段落、加粗、斜体、删除线
+- 有序列表、无序列表、任务列表
+- 引用、分隔线、链接、图片
+- 围栏代码块与行内代码
+- GFM 表格
+- 原始 HTML（经过安全清洗，脚本与事件属性会被移除）
+
+任务列表可以这样写：
+
+- [x] 打开示例文档
+- [x] 在左侧缩略图之间跳转
+- [ ] 打开你自己的 Markdown 文件
+- [ ] 用 Ctrl+F 搜一个词，再按 Enter
+
+## 一点使用建议
+
+把窗口拉大，纸面会跟着变大；点击顶栏右侧的百分比可以随时回到「适应窗口」。左侧预览可以收起，给正文让出更多空间；再点一下左边缘的展开按钮就能找回来。
+
+如果文档里有特别长的代码块，它会独占一页并在页内滚动，页脚会提示这一页「含长内容」。这是为了保证代码不被拦腰截断，也是固定纸面排版里比较稳妥的取舍。
+
+## 写在最后
+
+Markdown 的好处是内容和样式分开：作者只关心写什么，阅读器负责怎么放。这个阅读器只做一件事——把写好的文字，安静地放到纸上。
+
+你可以现在就打开自己的文档。拖拽进来，或者按 Ctrl+O。第一页出现的时候，阅读就已经开始了。
+
+> 墨阅 · 让 Markdown 像一本书。
+</script>
+
+<script src="vendor/marked.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
