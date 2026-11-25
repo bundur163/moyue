@@ -7,7 +7,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   macos:
@@ -47,3 +47,11 @@ jobs:
             desktop/dist/*.zip
           if-no-files-found: error
           retention-days: 14
+
+      - name: Upload macOS assets to GitHub Release
+        working-directory: desktop/dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          shasum -a 256 *.dmg *.zip > SHA256SUMS-macos.txt
+          gh release upload v1.2.0 *.dmg *.zip SHA256SUMS-macos.txt --clobber
