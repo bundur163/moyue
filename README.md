@@ -11,6 +11,8 @@
 任选一种，双击即可：
 
 - **单文件版**：`Markdown阅读器.html`（约 135 KB，已内联全部样式、脚本与示例文档）；
+- **Windows 桌面版**：[Moyue-1.2.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases)（约 81 MB，单文件免安装）；
+- **macOS 桌面版**：由 GitHub Actions 的 macOS runner 构建，产物见 Releases；
 - **源码版**：`index.html`（需要同目录的 `assets/` 与 `vendor/`）。
 
 打开后：
@@ -83,6 +85,14 @@ mdviewer/
 │  ├─ marked.min.js              marked v15.0.12（MIT）
 │  └─ marked.LICENSE
 ├─ build_single.py               生成单文件版
+├─ desktop/                      Electron 桌面壳（Windows/macOS）
+│  ├─ main.js                    窗口、菜单、打印桥接
+│  ├─ preload.js                 最小 contextBridge
+│  ├─ prepare.mjs                同步单文件阅读器
+│  ├─ package.json               electron-builder 配置
+│  ├─ build/                     图标（ico/icns/png）
+│  └─ README.md                  桌面打包说明
+├─ .github/workflows/            macOS 构建工作流
 ├─ .gitignore                    发布时排除无关本地文档
 ├─ 工作规则.md
 ├─ 设计/Markdown 阅读器设计说明书 V1.2.md
@@ -104,7 +114,8 @@ mdviewer/
 - **复制**：正文设置 `user-select:text`，不监听或阻止鼠标/复制事件；高亮与页脚不进入选区。
 - **缩放**：只改变 `transform: scale()`，不重新分页；`ResizeObserver` 在「适应窗口」模式下自动重算；连续布局会同步重排每一页。
 - **单文件打包**：`build_single.py` 将 CSS、marked、app.js 与许可证内联，产出可直接分发的 HTML。
-- **打印**：把全部逻辑页克隆进隐藏的 `.print-root`，用 `@media print` 切换为 A4 纸张；每页一张纸，工具栏/侧栏/搜索高亮不进入打印稿。
+- **打印**：把全部逻辑页克隆进隐藏的 `.print-root`，用 `@media print` 切换为 A4 纸张；每页一张纸，工具栏/侧栏/搜索高亮不进入打印稿；桌面版通过 IPC 调 Electron `webContents.print()`。
+- **桌面壳**：Electron 只做窗口与打印桥接，阅读器 HTML 原样加载；Windows 使用 7zS 单文件自解压包，macOS 由 GitHub Actions 的 macOS runner 构建 DMG/ZIP。
 
 ## 测试
 

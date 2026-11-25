@@ -1686,6 +1686,17 @@
   function printDocument() {
     if (!state.pages.length) return;
     preparePrint();
+
+    if (window.moyueDesktop && typeof window.moyueDesktop.print === 'function') {
+      window.moyueDesktop.print()
+        .then(() => clearPrint())
+        .catch((error) => {
+          clearPrint();
+          toast('打印失败：' + errorMessage(error));
+        });
+      return;
+    }
+
     try {
       window.print();
     } catch (error) {

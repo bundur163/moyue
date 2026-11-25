@@ -1,0 +1,81 @@
+{
+  "name": "moyue",
+  "productName": "墨阅",
+  "version": "1.2.0",
+  "description": "墨阅 · Markdown 阅读器",
+  "author": "bundur163",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "prepare-app": "node prepare.mjs",
+    "start": "npm run prepare-app && electron .",
+    "dist:win": "npm run prepare-app && electron-builder --win portable --x64",
+    "dist:mac": "npm run prepare-app && electron-builder --mac dmg zip --x64 --arm64"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "33.4.11",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.bundur163.moyue",
+    "productName": "墨阅",
+    "copyright": "Copyright © 2026 bundur163",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "compression": "maximum",
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Moyue-${version}-Windows-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Moyue-${version}-Windows-${arch}.${ext}",
+      "requestExecutionLevel": "user"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity",
+      "artifactName": "Moyue-${version}-macOS-${arch}.${ext}",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "墨阅 ${version}"
+    }
+  }
+}
