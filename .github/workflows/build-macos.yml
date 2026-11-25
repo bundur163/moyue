@@ -1,4 +1,3 @@
-# build macos
 name: build-macos
 
 on:
@@ -12,7 +11,7 @@ permissions:
 
 jobs:
   macos:
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 45
     steps:
       - name: Checkout
