@@ -1,6 +1,6 @@
 # 墨阅 · Markdown 阅读器
 
-一个零依赖、零安装的 Markdown 文档阅读器：打开文件即进入阅读状态，按 PDF 的方式**左侧页面预览、右侧单页阅读**，支持**文档大纲**、**连续滚动**、全文搜索与原生选中复制。
+一个零依赖、零安装的 Markdown 文档阅读器：打开文件即进入阅读状态，按 PDF 的方式**左侧页面预览、右侧单页阅读**，支持**文档大纲**、**连续滚动**、三档显示模式、全文搜索与原生选中复制。
 
 > GitHub：[bundur163/moyue](https://github.com/bundur163/moyue) · 项目中文名《墨阅》
 
@@ -8,15 +8,17 @@
 
 ## 快速开始
 
-任选一种，双击即可：
+任选一种：
 
-- **单文件版**：`Markdown阅读器.html`（约 135 KB，已内联全部样式、脚本与示例文档）；
-- **Windows 桌面版**：[Moyue-1.2.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-Windows-x64.exe)（约 81 MB，单文件免安装，未签名）；
-- **macOS 桌面版**：
-  - Apple Silicon：[DMG](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-arm64.dmg) / [ZIP](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-arm64.zip)
-  - Intel：[DMG](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-x64.dmg) / [ZIP](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-x64.zip)
-  - 未签名/未公证；首次打开请右键“打开”，或执行 `xattr -dr com.apple.quarantine /Applications/墨阅.app`
+- **Windows 桌面版（Tauri / WebView2，推荐）**：
+  - [Moyue-1.3.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases/download/v1.3.0/Moyue-1.3.0-Windows-x64.exe)：单文件便携版，约 8.9 MB，需要系统 WebView2 Runtime（Win10/11 通常已随 Edge 安装）
+  - [Moyue-1.3.0-Windows-x64-setup.exe](https://github.com/bundur163/moyue/releases/download/v1.3.0/Moyue-1.3.0-Windows-x64-setup.exe)：当前用户安装包，约 1.9 MB，安装时按需引导 WebView2
+  - 便携版请放在本地磁盘运行；不要把 exe 直接放在网络映射盘（如 `P:`），WebView2 用户数据目录不支持网络盘
+- **单文件版**：`Markdown阅读器.html`（约 139 KB，已内联全部样式、脚本与示例文档）；
+- **macOS 桌面版**：当前为 Electron v1.2.0 版本，[DMG/ZIP 见 Releases](https://github.com/bundur163/moyue/releases/tag/v1.2.0)；Tauri/macOS 版本等 Windows 版确认后再做；
 - **源码版**：`index.html`（需要同目录的 `assets/` 与 `vendor/`）。
+
+> 旧版 Windows Electron 单文件（81 MB）仍保留在 [v1.2.0 Release](https://github.com/bundur163/moyue/releases/tag/v1.2.0)，仅作备用。
 
 打开后：
 
@@ -35,10 +37,15 @@
 
 ![打印版式](测试/截图/09-打印版式.png)
 
+Windows Tauri 桌面版（1440×960，整页模式）：
+
+![Tauri Windows](测试/截图/11-tauri-windows.png)
+
 ## 功能
 
 - **打开即读**：`.md` / `.markdown` / `.txt`，自动识别 UTF-8、UTF-16、GB18030；
-- **PDF 式纸面**：760 × 1075 的固定纸张，自动分页、页脚页码、适应窗口缩放；
+- **PDF 式纸面**：760 × 1075 的固定纸张，自动分页、页脚页码；
+- **三档显示模式**：整页显示、满宽显示、1:1（100%），选择会记住并在下次打开文件时自动沿用；
 - **页面 / 大纲双模式**：缩略图预览与文档标题目录一键切换；点击大纲项跳到对应页并高亮当前项；
 - **连续纸面**：收起预览或大纲后，页面页尾接页首拼成长纸，滚动条连续滚动，页码随滚动同步；
 - **滚轮翻页**：单页模式滚到底后继续下滚自动到下一页；顶部继续上滚回到上一页；
@@ -63,7 +70,8 @@
 | 跳页 | 在页码框输入页码后回车 |
 | 搜索 | Ctrl+F，输入关键词；Enter 下一个，Shift+Enter 上一个 |
 | 清除搜索 | Esc 或搜索框右侧 × |
-| 缩放 | 顶栏 − / +；点击百分比恢复「适应窗口」 |
+| 缩放 | 顶栏 − / +；点击百分比恢复上次显示模式 |
+| 显示模式 | 顶栏三个图标：满宽 / 1:1 / 整页；记住最后一次选择 |
 | 打印 | 顶栏「打印」或 Ctrl+P；打印全文，每个逻辑页一张 A4 |
 | 收起 / 展开侧栏 | 侧栏右上角 ⟨、阅读区左边缘 ⟩；收起即进入连续纸面 |
 
@@ -88,17 +96,22 @@ mdviewer/
 │  ├─ marked.min.js              marked v15.0.12（MIT）
 │  └─ marked.LICENSE
 ├─ build_single.py               生成单文件版
-├─ desktop/                      Electron 桌面壳（Windows/macOS）
+├─ tauri/                        Tauri 桌面壳（Windows，当前主推）
+│  ├─ prepare.mjs                同步单文件阅读器 → ui/index.html
+│  ├─ package.json               Tauri CLI
+│  ├─ src-tauri/                 Rust、tauri.conf.json、capabilities、图标
+│  └─ README.md                  Windows 构建说明
+├─ desktop/                      Electron 桌面壳（旧版备用）
 │  ├─ main.js                    窗口、菜单、打印桥接
 │  ├─ preload.js                 最小 contextBridge
 │  ├─ prepare.mjs                同步单文件阅读器
 │  ├─ package.json               electron-builder 配置
 │  ├─ build/                     图标（ico/icns/png）
 │  └─ README.md                  桌面打包说明
-├─ .github/workflows/            macOS 构建工作流
+├─ .github/workflows/            Tauri Windows / macOS 构建工作流
 ├─ .gitignore                    发布时排除无关本地文档
 ├─ 工作规则.md
-├─ 设计/Markdown 阅读器设计说明书 V1.3.md
+├─ 设计/Markdown 阅读器设计说明书 V1.4.md
 ├─ 日志/2026-11-24.md
 ├─ 日志/2026-11-25.md
 └─ 测试/
@@ -116,10 +129,10 @@ mdviewer/
 - **滚轮翻页**：单页模式优先滚页内内容、再滚阅读区，到边界后累计滚轮距离翻页；800ms 冷却防止触控板连续跳页。
 - **搜索**：遍历每页文本节点做子串匹配，使用 CSS Custom Highlight API 高亮（不修改 DOM，因此不影响选区与复制）；单页模式只标当前页，连续模式标全部页面；命中上限 5000 条。
 - **复制**：正文设置 `user-select:text`，不监听或阻止鼠标/复制事件；高亮与页脚不进入选区。
-- **缩放**：只改变 `transform: scale()`，不重新分页；`ResizeObserver` 在「适应窗口」模式下自动重算；连续布局会同步重排每一页。
+- **缩放**：整页 / 满宽 / 1:1 三种模式；`ResizeObserver` 在整页和满宽模式下自动重算；手动 ± 不覆盖已保存的显示偏好；连续布局会同步重排每一页。
 - **单文件打包**：`build_single.py` 将 CSS、marked、app.js 与许可证内联，产出可直接分发的 HTML。
-- **打印**：把全部逻辑页克隆进隐藏的 `.print-root`，用 `@media print` 切换为 A4 纸张；每页一张纸，工具栏/侧栏/搜索高亮不进入打印稿；桌面版通过 IPC 调 Electron `webContents.print()`。
-- **桌面壳**：Electron 只做窗口与打印桥接，阅读器 HTML 原样加载；Windows 使用 7zS 单文件自解压包，macOS 由 GitHub Actions 的 macOS runner 构建 DMG/ZIP。
+- **打印**：把全部逻辑页克隆进隐藏的 `.print-root`，用 `@media print` 切换为 A4 纸张；每页一张纸，工具栏/侧栏/搜索高亮不进入打印稿；Tauri/WebView2 与浏览器都用 `window.print()` 调起系统打印。
+- **桌面壳**：Tauri 使用系统 WebView2，只做窗口与页面承载；阅读器 HTML 原样加载。Windows 单文件约 8.9 MB，安装包约 1.9 MB；Electron v1.2.0 保留为备用。
 
 ## 测试
 
@@ -131,7 +144,7 @@ python build_single.py
 node 测试/test_reader.mjs
 ```
 
-最近一次结果：**87 / 87 通过**，覆盖空状态、分页、缩略图、搜索、高亮、复制、翻页、缩放、侧栏、真实文件选择、GB18030、超长代码块拆分、超高块兜底、安全清洗、空白文档、单文件版、文档大纲、连续滚动、滚轮翻页与打印版式。详见 [`测试/测试记录.md`](测试/测试记录.md)。
+最近一次结果：**92 / 92 通过**，覆盖空状态、分页、缩略图、搜索、高亮、复制、翻页、缩放、侧栏、真实文件选择、GB18030、超长代码块拆分、超高块兜底、安全清洗、空白文档、单文件版、文档大纲、连续滚动、滚轮翻页、打印版式与三档显示模式。详见 [`测试/测试记录.md`](测试/测试记录.md)。
 
 ## 已知限制
 
@@ -147,10 +160,10 @@ node 测试/test_reader.mjs
 
 ## 项目文档
 
-- [设计说明书 V1.3](<设计/Markdown 阅读器设计说明书 V1.3.md>)：需求、分页、大纲、连续纸面、滚轮翻页、打印与桌面分发
+- [设计说明书 V1.4](<设计/Markdown 阅读器设计说明书 V1.4.md>)：显示模式、Tauri 桌面壳与分发
 - [工作日志 2026-11-24](日志/2026-11-24.md)：阅读器、打印与首次发布
-- [工作日志 2026-11-25](日志/2026-11-25.md)：Windows/macOS 桌面打包
-- [测试记录](测试/测试记录.md)：87 项自动化验收与截图索引
+- [工作日志 2026-11-25](日志/2026-11-25.md)：Windows/macOS 桌面打包与 Tauri 改造
+- [测试记录](测试/测试记录.md)：92 项自动化验收与截图索引
 - [工作规则](工作规则.md)：本项目的目录、日志与交付规范
 
 ## 许可证
