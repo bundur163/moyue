@@ -763,7 +763,7 @@ async function runTests() {
       };
     })()`);
     check('单文件版包含大纲与连续模式',
-      singleFeatures.version === '1.2.0' && singleFeatures.outlineItems > 0 &&
+      singleFeatures.version === '1.3.0' && singleFeatures.outlineItems > 0 &&
       singleFeatures.outlineMode && singleFeatures.continuous && singleFeatures.layout === 'single',
       JSON.stringify(singleFeatures));
     await sleep(150);
@@ -1080,6 +1080,84 @@ async function runTests() {
     return { children: document.getElementById('printRoot').childElementCount };
   })()`);
   check('打印结束清理临时纸张', printCleared.children === 0, JSON.stringify(printCleared));
+
+  section('16. 显示模式与偏好');
+  await navigate(fileUrl('index.html') + '?demo=1');
+  await waitFor(async () => evaluate('MDV.state.pages.length >= 3'), 15000, '显示模式测试文档分页');
+
+  const modes = await evaluate(`(() => {
+    const stage = document.getElementById('stageScroll');
+    const frame = document.getElementById('pageFrame');
+    const saved = () => localStorage.getItem('moyue.view-mode.v1');
+    document.getElementById('modeWidth').click();
+    const width = {
+      mode: MDV.state.zoomMode,
+      saved: saved(),
+      scale: MDV.state.scale,
+      frame: Math.round(frame.getBoundingClientRect().width),
+      expected: Math.round(stage.clientWidth - 80),
+      active: document.querySelector('.view-mode.active')?.id
+    };
+    document.getElementById('modeActual').click();
+    const actual = {
+      mode: MDV.state.zoomMode,
+      saved: saved(),
+      scale: MDV.state.scale,
+      frame: Math.round(frame.getBoundingClientRect().width),
+      active: document.querySelector('.view-mode.active')?.id
+    };
+    document.getElementById('modePage').click();
+    const page = {
+      mode: MDV.state.zoomMode,
+      saved: saved(),
+      scale: MDV.state.scale,
+      frame: Math.round(frame.getBoundingClientRect().width),
+      active: document.querySelector('.view-mode.active')?.id
+    };
+    return { width, actual, page };
+  })()`);
+
+  check('满宽显示铺满阅读区', modes.width.mode === 'width' && modes.width.active === 'modeWidth' &&
+    Math.abs(modes.width.frame - modes.width.expected) <= 2 && modes.width.saved === 'width',
+    JSON.stringify(modes.width));
+  check('1:1 显示为 100%', modes.actual.mode === 'actual' && modes.actual.active === 'modeActual' &&
+    modes.actual.scale === 1 && modes.actual.frame === 760 && modes.actual.saved === 'actual',
+    JSON.stringify(modes.actual));
+  check('整页显示为默认适配', modes.page.mode === 'fit' && modes.page.active === 'modePage' &&
+    modes.page.frame < 760 && modes.page.saved === 'fit',
+    JSON.stringify(modes.page));
+
+  await evaluate(`document.getElementById('modeWidth').click()`);
+  await sleep(150);
+  await screenshot('满宽显示');
+
+  const preference = await evaluate(`(async () => {
+    document.getElementById('modeWidth').click();
+    document.getElementById('zoomIn').click();
+    const manual = {
+      mode: MDV.state.zoomMode,
+      saved: localStorage.getItem('moyue.view-mode.v1'),
+      active: document.querySelectorAll('.view-mode.active').length
+    };
+    await MDV.openText('偏好测试.md', '# 偏好测试\\n\\n' + '内容。'.repeat(300));
+    return {
+      manual,
+      reopenedMode: MDV.state.zoomMode,
+      reopenedSaved: localStorage.getItem('moyue.view-mode.v1'),
+      reopenedScale: MDV.state.scale,
+      active: document.querySelector('.view-mode.active')?.id,
+      frame: Math.round(document.getElementById('pageFrame').getBoundingClientRect().width)
+    };
+  })()`, { awaitPromise: true });
+  check('手动缩放不覆盖显示偏好', preference.manual.saved === 'width' &&
+    preference.manual.active === 0 && preference.manual.mode !== 'width',
+    JSON.stringify(preference.manual));
+  check('再次打开文件沿用满宽偏好', preference.reopenedMode === 'width' &&
+    preference.reopenedSaved === 'width' && preference.active === 'modeWidth' &&
+    preference.reopenedScale > 1,
+    JSON.stringify(preference));
+
+  await evaluate(`document.getElementById('modePage').click()`);
 }
 
 async function main() {

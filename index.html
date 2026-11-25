@@ -56,6 +56,18 @@
 
     <span class="v-divider" aria-hidden="true"></span>
 
+    <div class="view-modes" role="group" aria-label="显示模式">
+      <button class="icon-btn view-mode" id="modeWidth" type="button" title="满宽显示" aria-label="满宽显示" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"></rect><path d="M8 12h8M8 12l2-2M8 12l2 2M16 12l-2-2M16 12l-2 2"></path></svg>
+      </button>
+      <button class="icon-btn view-mode view-mode-actual" id="modeActual" type="button" title="1:1 显示（100%）" aria-label="1:1 显示" aria-pressed="false">1:1</button>
+      <button class="icon-btn view-mode active" id="modePage" type="button" title="整页显示" aria-label="整页显示" aria-pressed="true">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"></rect><path d="M8 6H6v2M16 6h2v2M8 18H6v-2M18 18h-2v-2"></path></svg>
+      </button>
+    </div>
+
+    <span class="v-divider" aria-hidden="true"></span>
+
     <div class="zoom" role="group" aria-label="缩放">
       <button class="icon-btn" id="zoomOut" type="button" title="缩小" aria-label="缩小">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg>

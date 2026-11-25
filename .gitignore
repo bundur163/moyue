@@ -11,6 +11,10 @@
 desktop/node_modules/
 desktop/dist/
 desktop/app/
+tauri/node_modules/
+tauri/ui/index.html
+tauri/src-tauri/target/
+tauri/src-tauri/gen/
 .npm-cache/
 .electron-cache/
 

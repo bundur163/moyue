@@ -14,6 +14,8 @@
   const FIT_MAX = 1.25;
   const HIGHLIGHT_ALL = 'mdv-search';
   const HIGHLIGHT_ACTIVE = 'mdv-search-active';
+  const VIEW_MODE_KEY = 'moyue.view-mode.v1';
+  const VIEW_MODES = ['fit', 'width', 'actual'];
 
   const state = {
     ready: false,
@@ -25,6 +27,7 @@
     query: '',
     scale: 1,
     zoomMode: 'fit',
+    viewMode: 'fit',
     token: 0,
     charCount: 0,
     sidebarMode: 'pages',
@@ -57,9 +60,12 @@
   function init() {
     cacheElements();
     measurePage();
+    state.viewMode = loadViewMode();
+    state.zoomMode = state.viewMode;
     bindEvents();
     exposeApi();
     state.ready = true;
+    updateViewModeButtons();
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('demo') === '1') {
@@ -73,6 +79,7 @@
       'docTitle', 'docBadge', 'topbarControls', 'searchBox', 'searchInput',
       'searchCount', 'searchPrev', 'searchNext', 'searchClear', 'prevPage',
       'nextPage', 'pageInput', 'pageTotal', 'zoomOut', 'zoomIn', 'zoomLabel',
+      'modeWidth', 'modeActual', 'modePage',
       'openBtn', 'fileInput', 'emptyOpenBtn', 'demoBtn', 'sidebar',
       'sidebarCount', 'thumbs', 'outline', 'tabPages', 'tabOutline',
       'collapseSidebar', 'expandSidebar', 'stage', 'stageScroll', 'stageInner',
@@ -131,9 +138,13 @@
     el.zoomOut.addEventListener('click', () => stepZoom(-0.1));
     el.zoomIn.addEventListener('click', () => stepZoom(0.1));
     el.zoomLabel.addEventListener('click', () => {
-      state.zoomMode = 'fit';
+      state.zoomMode = state.viewMode;
+      updateViewModeButtons();
       applyZoom();
     });
+    el.modeWidth.addEventListener('click', () => setViewMode('width'));
+    el.modeActual.addEventListener('click', () => setViewMode('actual'));
+    el.modePage.addEventListener('click', () => setViewMode('fit'));
 
     el.printBtn.addEventListener('click', printDocument);
     window.addEventListener('beforeprint', preparePrint);
@@ -187,7 +198,7 @@
 
     if (typeof ResizeObserver === 'function') {
       const observer = new ResizeObserver(() => {
-        if (state.pages.length && state.zoomMode === 'fit') applyZoom();
+        if (state.pages.length && (state.zoomMode === 'fit' || state.zoomMode === 'width')) applyZoom();
       });
       observer.observe(el.stage);
     }
@@ -195,10 +206,12 @@
 
   function exposeApi() {
     window.MDV = {
-      version: '1.2.0',
+      version: '1.3.0',
       get ready() { return state.ready; },
       state,
       PAGE,
+      setViewMode,
+      getViewMode() { return state.viewMode; },
       pageCount() { return state.pages.length; },
       outlineInfo() {
         return state.outline.map((item, index) => ({
@@ -244,7 +257,12 @@
       prevHit() { if (state.hits.length) activateHit(state.hitIndex - 1, true); },
       clearSearch() { clearSearch(false); },
       setZoom(value) {
-        state.zoomMode = value === 'fit' ? 'fit' : clamp(Number(value) || 1, MIN_ZOOM, MAX_ZOOM);
+        if (VIEW_MODES.includes(value)) {
+          setViewMode(value);
+          return;
+        }
+        state.zoomMode = clamp(Number(value) || 1, MIN_ZOOM, MAX_ZOOM);
+        updateViewModeButtons();
         applyZoom();
       },
       getDemoSource
@@ -329,7 +347,8 @@
       finalizePages();
 
       showReadingUI();
-      state.zoomMode = 'fit';
+      state.zoomMode = state.viewMode;
+      updateViewModeButtons();
       state.current = 0;
       buildOutline();
       buildThumbs();
@@ -1225,8 +1244,48 @@
   }
 
   /* ------------------------------------------------------------------------
-     缩放
+     显示模式与缩放
      ------------------------------------------------------------------------ */
+
+  function loadViewMode() {
+    try {
+      const saved = window.localStorage.getItem(VIEW_MODE_KEY);
+      return VIEW_MODES.includes(saved) ? saved : 'fit';
+    } catch (error) {
+      return 'fit';
+    }
+  }
+
+  function saveViewMode(mode) {
+    try {
+      window.localStorage.setItem(VIEW_MODE_KEY, mode);
+    } catch (error) {
+      /* 隐私模式 / 禁用 localStorage 时忽略 */
+    }
+  }
+
+  function setViewMode(mode) {
+    if (!VIEW_MODES.includes(mode)) return;
+    state.viewMode = mode;
+    state.zoomMode = mode;
+    saveViewMode(mode);
+    updateViewModeButtons();
+    applyZoom();
+  }
+
+  function updateViewModeButtons() {
+    const activeMode = VIEW_MODES.includes(state.zoomMode) ? state.zoomMode : null;
+    const mapping = [
+      [el.modeWidth, 'width'],
+      [el.modeActual, 'actual'],
+      [el.modePage, 'fit']
+    ];
+    for (const [button, mode] of mapping) {
+      const active = activeMode === mode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    }
+  }
 
   function fitScale() {
     const rect = el.stageScroll.getBoundingClientRect();
@@ -1237,9 +1296,22 @@
     return clamp(fit, MIN_ZOOM, MAX_ZOOM);
   }
 
+  function fitWidthScale() {
+    const rect = el.stageScroll.getBoundingClientRect();
+    if (rect.width < 40) return 1;
+    const availableWidth = Math.max(200, rect.width - 80);
+    return clamp(availableWidth / PAGE.w, MIN_ZOOM, MAX_ZOOM);
+  }
+
   function applyZoom() {
     if (!state.pages.length) return;
-    const scale = state.zoomMode === 'fit' ? fitScale() : clamp(state.zoomMode, MIN_ZOOM, MAX_ZOOM);
+
+    let scale;
+    if (state.zoomMode === 'fit') scale = fitScale();
+    else if (state.zoomMode === 'width') scale = fitWidthScale();
+    else if (state.zoomMode === 'actual') scale = 1;
+    else scale = clamp(Number(state.zoomMode) || 1, MIN_ZOOM, MAX_ZOOM);
+
     state.scale = scale;
     const width = PAGE.w * scale;
     const height = PAGE.h * scale;
@@ -1265,18 +1337,32 @@
       });
     }
 
+    updateViewModeButtons();
     const percent = Math.round(scale * 100);
     el.zoomLabel.textContent = percent + '%';
-    el.zoomLabel.title = state.zoomMode === 'fit'
-      ? '适应窗口（' + percent + '%），点击切换为手动缩放'
-      : '当前为手动缩放，点击恢复适应窗口';
+    if (state.zoomMode === 'fit') {
+      el.zoomLabel.title = '整页显示（' + percent + '%）';
+    } else if (state.zoomMode === 'width') {
+      el.zoomLabel.title = '满宽显示（' + percent + '%）';
+    } else if (state.zoomMode === 'actual') {
+      el.zoomLabel.title = '1:1 显示（100%）';
+    } else {
+      el.zoomLabel.title = '手动缩放（' + percent + '%），点击恢复' + viewModeName(state.viewMode);
+    }
   }
 
   function stepZoom(delta) {
     if (!state.pages.length) return;
-    const base = state.zoomMode === 'fit' ? state.scale : state.zoomMode;
+    const base = typeof state.zoomMode === 'number' ? state.zoomMode : state.scale;
     state.zoomMode = clamp(Math.round((base + delta) * 10) / 10, MIN_ZOOM, MAX_ZOOM);
+    updateViewModeButtons();
     applyZoom();
+  }
+
+  function viewModeName(mode) {
+    if (mode === 'width') return '满宽显示';
+    if (mode === 'actual') return '1:1 显示';
+    return '整页显示';
   }
 
   /* ------------------------------------------------------------------------
