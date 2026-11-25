@@ -11,8 +11,8 @@
 任选一种：
 
 - **Windows 桌面版（Tauri / WebView2，推荐）**：
-  - [Moyue-1.3.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases/download/v1.3.0/Moyue-1.3.0-Windows-x64.exe)：单文件便携版，约 8.9 MB，需要系统 WebView2 Runtime（Win10/11 通常已随 Edge 安装）
-  - [Moyue-1.3.0-Windows-x64-setup.exe](https://github.com/bundur163/moyue/releases/download/v1.3.0/Moyue-1.3.0-Windows-x64-setup.exe)：当前用户安装包，约 1.9 MB，安装时按需引导 WebView2
+  - [Moyue-1.3.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases/download/v1.3.0/Moyue-1.3.0-Windows-x64.exe)：单文件便携版，约 9.0 MB，需要系统 WebView2 Runtime（Win10/11 通常已随 Edge 安装）
+  - [Moyue-1.3.0-Windows-x64-setup.exe](https://github.com/bundur163/moyue/releases/download/v1.3.0/Moyue-1.3.0-Windows-x64-setup.exe)：当前用户安装包，约 2.0 MB，安装时按需引导 WebView2
   - 便携版请放在本地磁盘运行；不要把 exe 直接放在网络映射盘（如 `P:`），WebView2 用户数据目录不支持网络盘
 - **单文件版**：`Markdown阅读器.html`（约 139 KB，已内联全部样式、脚本与示例文档）；
 - **macOS 桌面版**：当前为 Electron v1.2.0 版本，[DMG/ZIP 见 Releases](https://github.com/bundur163/moyue/releases/tag/v1.2.0)；Tauri/macOS 版本等 Windows 版确认后再做；
@@ -132,7 +132,7 @@ mdviewer/
 - **缩放**：整页 / 满宽 / 1:1 三种模式；`ResizeObserver` 在整页和满宽模式下自动重算；手动 ± 不覆盖已保存的显示偏好；连续布局会同步重排每一页。
 - **单文件打包**：`build_single.py` 将 CSS、marked、app.js 与许可证内联，产出可直接分发的 HTML。
 - **打印**：把全部逻辑页克隆进隐藏的 `.print-root`，用 `@media print` 切换为 A4 纸张；每页一张纸，工具栏/侧栏/搜索高亮不进入打印稿；Tauri/WebView2 与浏览器都用 `window.print()` 调起系统打印。
-- **桌面壳**：Tauri 使用系统 WebView2，只做窗口与页面承载；阅读器 HTML 原样加载。Windows 单文件约 8.9 MB，安装包约 1.9 MB；Electron v1.2.0 保留为备用。
+- **桌面壳**：Tauri 使用系统 WebView2，只做窗口与页面承载；阅读器 HTML 原样加载。Windows 单文件约 9.0 MB，安装包约 2.0 MB；Electron v1.2.0 保留为备用。
 
 ## 测试
 

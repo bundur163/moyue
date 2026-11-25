@@ -39,11 +39,11 @@ npm run build:win
 
 - GitHub Actions `build-tauri-windows` 在 `windows-latest` 构建成功；
 - 产物：
-  - `moyue.exe` 8,892,928 字节（约 8.9 MB）
-  - `墨阅_1.3.0_x64-setup.exe` 1,946,542 字节（约 1.9 MB）
+  - `moyue.exe` 8,984,064 字节（约 9.0 MB）
+  - `墨阅_1.3.0_x64-setup.exe` 1,962,319 字节（约 2.0 MB）
 - 在 Windows 本地磁盘启动 `moyue.exe`，窗口标题「墨阅」，页面版本 1.3.0，示例文档 4 页；
 - 通过 WebView2 CDP 验证三档显示模式与 localStorage 偏好；
-- 重要：**不要直接从网络映射盘（如 `P:`）运行便携 exe**，WebView2 用户数据目录会报 os error 5（拒绝访问）。复制到本地磁盘/下载目录运行，或使用安装包安装到 `%LOCALAPPDATA%`。
+- 应用已把 WebView2 数据目录固定到 `%LOCALAPPDATA%`，但 WebView2 仍不支持直接从网络映射盘（如 `P:`）运行便携 exe；请复制到本地磁盘/下载目录运行，或使用安装包安装到 `%LOCALAPPDATA%`。
 - 发布地址：https://github.com/bundur163/moyue/releases/tag/v1.3.0
 
 ## 与 Electron 版的差异

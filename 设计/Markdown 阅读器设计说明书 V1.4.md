@@ -277,7 +277,7 @@ mdviewer/
 9. 滚轮：单页向下翻页、向上回页、末页不越界；
 10. 打印：按钮存在、逐页生成打印纸、屏幕隐藏、打印媒体隐藏应用、A4 尺寸、溢出页延展、清理临时纸张；
 11. 显示模式：满宽、1:1、整页、手动缩放不覆盖偏好、再次打开文件沿用偏好；
-12. 桌面：Tauri Windows 便携 exe 启动、窗口标题「墨阅」、8.9MB/1.9MB 产物、SHA-256；macOS 本轮不做；
+12. 桌面：Tauri Windows 便携 exe 启动、窗口标题「墨阅」、9.0MB/2.0MB 产物、SHA-256；macOS 本轮不做；
 13. 截图归档到 `测试/截图/`；失败时进程退出码非 0。
 
 手工验收：双击 `index.html` → 打开 `测试/fixtures/阅读器验收文档.md` → 目视检查分页、缩略图、搜索、复制；切换大纲并点击标题；收起侧栏连续滚动，再展开；点击打印或 Ctrl+P 检查打印预览；对单文件版重复一次。
@@ -310,7 +310,7 @@ mdviewer/
 - [x] `Markdown阅读器.html` 单文件版（脚本生成）
 - [x] `README.md` 使用说明
 - [x] `设计/Markdown 阅读器设计说明书 V1.4.md`
-- [x] `tauri/` Tauri Windows 桌面壳 + 8.9MB 便携版 + 1.9MB 安装包
+- [x] `tauri/` Tauri Windows 桌面壳 + 9.0MB 便携版 + 2.0MB 安装包
 - [x] `desktop/` Electron v1.2 备用桌面壳
 - [x] `测试/test_reader.mjs` + 测试文档 + `测试/测试记录.md` + 截图
 - [x] 当日工作日志与变更影响评估
@@ -318,7 +318,7 @@ mdviewer/
 ## 13. 桌面分发（V1.3 / V1.4）
 
 - **单一事实来源**：桌面版不维护第二套 UI；`tauri/prepare.mjs` 将 `Markdown阅读器.html` 复制为 `ui/index.html`，Tauri 把它嵌入可执行文件；
-- **Windows（V1.4 主方案）**：Tauri 2 + 系统 WebView2。不打包 Chromium，单文件 `moyue.exe` 约 8.9 MB，NSIS 当前用户安装包约 1.9 MB；安装包按需引导 WebView2；
+- **Windows（V1.4 主方案）**：Tauri 2 + 系统 WebView2。不打包 Chromium，单文件 `moyue.exe` 约 9.0 MB，NSIS 当前用户安装包约 2.0 MB；安装包按需引导 WebView2；应用把 WebView2 数据目录固定到 `%LOCALAPPDATA%`；
 - **平台限制**：便携 exe 不能直接放在网络映射盘（如 `P:`）运行，WebView2 用户数据目录会报 os error 5；应复制到本地磁盘或使用安装包；
 - **打印**：Tauri/WebView2 中调用 `window.print()` 打开系统打印对话框；A4 打印样式与浏览器版共用；
 - **安全**：Tauri 不暴露 Node；本地 HTML 通过 Tauri 自定义协议加载；macOS 后续使用 WKWebView；
