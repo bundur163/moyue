@@ -11,8 +11,11 @@
 任选一种，双击即可：
 
 - **单文件版**：`Markdown阅读器.html`（约 135 KB，已内联全部样式、脚本与示例文档）；
-- **Windows 桌面版**：[Moyue-1.2.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases)（约 81 MB，单文件免安装）；
-- **macOS 桌面版**：由 GitHub Actions 的 macOS runner 构建，产物见 Releases；
+- **Windows 桌面版**：[Moyue-1.2.0-Windows-x64.exe](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-Windows-x64.exe)（约 81 MB，单文件免安装，未签名）；
+- **macOS 桌面版**：
+  - Apple Silicon：[DMG](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-arm64.dmg) / [ZIP](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-arm64.zip)
+  - Intel：[DMG](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-x64.dmg) / [ZIP](https://github.com/bundur163/moyue/releases/download/v1.2.0/Moyue-1.2.0-macOS-x64.zip)
+  - 未签名/未公证；首次打开请右键“打开”，或执行 `xattr -dr com.apple.quarantine /Applications/墨阅.app`
 - **源码版**：`index.html`（需要同目录的 `assets/` 与 `vendor/`）。
 
 打开后：
@@ -95,8 +98,9 @@ mdviewer/
 ├─ .github/workflows/            macOS 构建工作流
 ├─ .gitignore                    发布时排除无关本地文档
 ├─ 工作规则.md
-├─ 设计/Markdown 阅读器设计说明书 V1.2.md
+├─ 设计/Markdown 阅读器设计说明书 V1.3.md
 ├─ 日志/2026-11-24.md
+├─ 日志/2026-11-25.md
 └─ 测试/
    ├─ fixtures/                  验收文档、长代码块、GB18030 文档
    ├─ test_reader.mjs            Edge headless + CDP 自动化测试
@@ -143,8 +147,9 @@ node 测试/test_reader.mjs
 
 ## 项目文档
 
-- [设计说明书 V1.2](<设计/Markdown 阅读器设计说明书 V1.2.md>)：需求、分页、大纲、连续纸面、滚轮翻页、打印与测试方案
-- [工作日志](日志/2026-11-24.md)：指令登记、执行过程、成果与变更影响评估
+- [设计说明书 V1.3](<设计/Markdown 阅读器设计说明书 V1.3.md>)：需求、分页、大纲、连续纸面、滚轮翻页、打印与桌面分发
+- [工作日志 2026-11-24](日志/2026-11-24.md)：阅读器、打印与首次发布
+- [工作日志 2026-11-25](日志/2026-11-25.md)：Windows/macOS 桌面打包
 - [测试记录](测试/测试记录.md)：87 项自动化验收与截图索引
 - [工作规则](工作规则.md)：本项目的目录、日志与交付规范
 

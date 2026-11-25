@@ -48,10 +48,13 @@ macOS 产物由 GitHub Actions 的 macOS runner 构建，配置文件：
 .github/workflows/build-macos.yml
 ```
 
-在 GitHub 仓库 Actions 中运行 `build-macos`，会生成：
+`build-macos` 运行后生成并直接上传到 Release v1.2.0：
 
 - `Moyue-1.2.0-macOS-x64.dmg` / `.zip`
 - `Moyue-1.2.0-macOS-arm64.dmg` / `.zip`
+- `SHA256SUMS-macos.txt`
+
+下载地址：https://github.com/bundur163/moyue/releases/tag/v1.2.0
 
 macOS 版本未做开发者签名/公证，首次打开需右键“打开”，或在终端执行：
 
