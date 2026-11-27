@@ -84,7 +84,7 @@
 | macOS 构建：GitHub Actions macos-latest | **采用** | Windows 无法跨平台生成 macOS 包；由 macOS runner 构建 x64/arm64 DMG/ZIP |
 | 桌面壳：Tauri 2 + WebView2 | **采用** | 不打包 Chromium；Windows 单文件约 9.0 MB，启动快 |
 | 桌面壳：Tauri 2 + WKWebView（macOS） | **采用** | Universal DMG 约 5.8 MB；原生打印 |
-| 桌面壳：Electron 33 | 保留备用 | v1.2.0 已发布；体积 81 MB，启动慢 |
+| 桌面壳：Electron 33 | 历史 | 源码保留；v1.2.0 发布资源已清理 |
 | 三档显示：整页 / 满宽 / 1:1 | **采用** | 在现有 `transform: scale()` 基础上增加三种自动比例；偏好存 localStorage |
 | 单文件分发：Python 内联脚本 | **采用** | 保持源码可读，同时产出可单独复制的一个 HTML 文件；符合参考项目 `build_*.py` 惯例 |
 
@@ -309,7 +309,7 @@ mdviewer/
 | WKWebView 版本 | 旧版 macOS WebKit 不支持 CSS Custom Highlight，搜索高亮可能不可用 | 搜索跳转仍可用；建议较新 macOS |
 | macOS 实机验证 | 只在 GitHub macOS runner 构建，未在实体 Mac 启动 | 已核对 DMG、Info.plist 与 Universal Mach-O；等用户实机确认 |
 | 显示偏好 | localStorage 被清理后回到整页模式 | 属预期；三档按钮始终可手动切换 |
-| Electron 备用 | 体积 81MB、每次自解压慢 | 保留 v1.2.0 作备用，不再主推 |
+| Electron 历史 | 体积 81MB、每次自解压慢 | 源码保留；发布资源已清理，不再提供 |
 
 ## 12. 交付清单
 

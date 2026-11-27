@@ -98,7 +98,7 @@ mdviewer/
 │  ├─ marked.min.js              marked v15.0.12（MIT）
 │  └─ marked.LICENSE
 ├─ build_single.py               生成单文件版
-├─ tauri/                        Tauri 桌面壳（Windows，当前主推）
+├─ tauri/                        Tauri 桌面壳（Windows/macOS，当前主推）
 │  ├─ prepare.mjs                同步单文件阅读器 → ui/index.html
 │  ├─ package.json               Tauri CLI
 │  ├─ src-tauri/                 Rust、tauri.conf.json、capabilities、图标
