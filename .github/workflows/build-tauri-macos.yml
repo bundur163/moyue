@@ -1,0 +1,74 @@
+name: build-tauri-macos
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add universal macOS targets
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: Cache Rust target
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tauri/src-tauri -> target
+
+      - name: Install Tauri CLI
+        working-directory: tauri
+        run: npm ci
+
+      - name: Build universal macOS app and DMG
+        working-directory: tauri
+        run: npm run build:mac
+
+      - name: Prepare macOS release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          APP="$(find tauri/src-tauri/target/universal-apple-darwin/release/bundle/macos -maxdepth 1 -name '*.app' | head -n 1)"
+          DMG="$(find tauri/src-tauri/target/universal-apple-darwin/release/bundle/dmg -maxdepth 1 -name '*.dmg' | head -n 1)"
+          test -n "$APP"
+          test -n "$DMG"
+          cp "$DMG" release/Moyue-1.3.0-macOS-universal.dmg
+          ditto -c -k --keepParent "$APP" release/Moyue-1.3.0-macOS-universal.zip
+          shasum -a 256 release/Moyue-1.3.0-macOS-universal.dmg release/Moyue-1.3.0-macOS-universal.zip > release/Moyue-1.3.0-macOS-universal.sha256
+          ls -lh release
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: moyue-tauri-macos
+          path: |
+            release/Moyue-1.3.0-macOS-universal.dmg
+            release/Moyue-1.3.0-macOS-universal.zip
+            release/Moyue-1.3.0-macOS-universal.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload macOS assets to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload v1.3.0 \
+            release/Moyue-1.3.0-macOS-universal.dmg \
+            release/Moyue-1.3.0-macOS-universal.zip \
+            release/Moyue-1.3.0-macOS-universal.sha256 \
+            --clobber

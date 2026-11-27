@@ -8,6 +8,7 @@
 .publish/
 
 # 桌面打包依赖与产物
+release/
 desktop/node_modules/
 desktop/dist/
 desktop/app/

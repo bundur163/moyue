@@ -1773,6 +1773,20 @@
     if (!state.pages.length) return;
     preparePrint();
 
+    const tauri = window.__TAURI_INTERNALS__;
+    const isMac = /Mac/i.test(navigator.platform || navigator.userAgent || '');
+    if (isMac && tauri && typeof tauri.invoke === 'function') {
+      tauri.invoke('print_document').catch((error) => {
+        try {
+          window.print();
+        } catch (fallbackError) {
+          clearPrint();
+          toast('打印失败：' + errorMessage(fallbackError || error));
+        }
+      });
+      return;
+    }
+
     if (window.moyueDesktop && typeof window.moyueDesktop.print === 'function') {
       window.moyueDesktop.print()
         .then(() => clearPrint())
