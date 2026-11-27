@@ -20,7 +20,7 @@
 - **单文件版**：`Markdown阅读器.html`（约 140 KB，已内联全部样式、脚本与示例文档）；
 - **源码版**：`index.html`（需要同目录的 `assets/` 与 `vendor/`）。
 
-> 旧版 Windows Electron 单文件（81 MB）仍保留在 [v1.2.0 Release](https://github.com/bundur163/moyue/releases/tag/v1.2.0)，仅作备用。
+> 旧的 Electron Windows/macOS 产物已清理，不再发布；当前只保留 Tauri 版本。
 
 打开后：
 

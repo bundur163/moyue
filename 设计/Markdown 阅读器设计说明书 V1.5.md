@@ -318,7 +318,7 @@ mdviewer/
 - [x] `README.md` 使用说明
 - [x] `设计/Markdown 阅读器设计说明书 V1.5.md`
 - [x] `tauri/` Tauri Windows + macOS Universal 桌面壳
-- [x] `desktop/` Electron v1.2 备用桌面壳
+- [x] `desktop/` Electron v1.2 历史源码（不再发布）
 - [x] `测试/test_reader.mjs` + 测试文档 + `测试/测试记录.md` + 截图
 - [x] 当日工作日志与变更影响评估
 
@@ -330,5 +330,5 @@ mdviewer/
 - **macOS（V1.5）**：同一 Tauri 工程，`macos-latest` 上构建 Universal（x86_64 + arm64）DMG，约 5.8 MB；打印通过 Tauri 命令调用 WKWebView 原生打印；
 - **打印**：Windows 使用 `window.print()` 调起 WebView2 系统打印；macOS 使用 `print_document` 命令；A4 打印样式共用；
 - **安全**：Tauri 不暴露 Node；本地 HTML 通过 Tauri 自定义协议加载；macOS 使用 WKWebView；
-- **Electron 备用（V1.3）**：`desktop/` 保留 v1.2.0 Electron 33 壳与 7zS 单文件（81 MB）；仅作备用；
+- **Electron 历史**：`desktop/` 源码保留为历史参考，但 v1.2.0 发布资源已清理，不再作为分发方案；
 - **发布**：v1.3.0 Release 包含 Windows 便携/安装包、macOS Universal DMG 与 SHA-256；全部未签名。
